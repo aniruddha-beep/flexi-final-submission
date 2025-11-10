@@ -11,21 +11,35 @@ const inputStyle = {
   color: '#333',
 };
 
+const validateEmail = email =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) // standard email format
+  // && email.endsWith('@gmail.com'); // uncomment this line to restrict to gmail only
+
 const SignUp = ({ onSignUp }) => {
-  // Local state for "typing" in fields
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [error, setError] = useState('');
 
-  // Optional: add fake validation if you want
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
-    // Basic check
-    if (email && password && password === confirm) {
-      onSignUp();
-    } else {
-      alert("Please fill all fields and make sure passwords match.");
+    // Validation logic:
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email address.');
+      return;
     }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+    if (password !== confirm) {
+      setError('Passwords do not match.');
+      return;
+    }
+    setError('');
+    // Save credentials to localStorage (mock, demo only! Never do in real apps)
+    localStorage.setItem('mockUser', JSON.stringify({ email, password }));
+    onSignUp();
   };
 
   return (
@@ -52,6 +66,7 @@ const SignUp = ({ onSignUp }) => {
           color: '#333',
           fontWeight: '600',
         }}>Create Your Account</h2>
+
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '1rem' }}>
             <input
@@ -83,7 +98,9 @@ const SignUp = ({ onSignUp }) => {
               required
             />
           </div>
-
+          {error && (
+            <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>
+          )}
           <button
             type="submit"
             style={{

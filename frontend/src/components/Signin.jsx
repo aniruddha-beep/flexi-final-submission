@@ -1,20 +1,44 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const inputStyle = { /* ...same as above... */ };
+const inputStyle = {
+  width: '100%',
+  padding: '0.75rem 1rem',
+  border: '1px solid #ddd',
+  borderRadius: '8px',
+  boxSizing: 'border-box',
+  fontSize: '1rem',
+  color: '#333',
+};
+
+const validateEmail = email =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) // standard email format
+  // && email.endsWith('@gmail.com'); // uncomment for domain restriction
 
 const SignIn = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  // Dummy "login" handler
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
-    if (email && password) {
-      onLogin();
-    } else {
-      alert("Enter both fields.");
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email address.');
+      return;
     }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
+    // Retrieve stored user credentials from localStorage
+    const savedUser = JSON.parse(localStorage.getItem('mockUser'));
+    if (!savedUser || savedUser.email !== email || savedUser.password !== password) {
+      setError('Invalid email or password.');
+      return;
+    }
+    setError('');
+    onLogin();
   };
 
   return (
@@ -35,9 +59,15 @@ const SignIn = ({ onLogin }) => {
         maxWidth: '380px',
         textAlign: 'center',
       }}>
-        <h2>Sign In to Your Account</h2>
+        <h2 style={{
+          fontSize: '1.75rem',
+          marginBottom: '1.5rem',
+          color: '#333',
+          fontWeight: '600',
+        }}>Sign In to Your Account</h2>
+
         <form onSubmit={handleSubmit}>
-          <div>
+          <div style={{ marginBottom: '1rem' }}>
             <input
               type="email"
               value={email}
@@ -47,7 +77,7 @@ const SignIn = ({ onLogin }) => {
               required
             />
           </div>
-          <div>
+          <div style={{ marginBottom: '1.5rem' }}>
             <input
               type="password"
               value={password}
@@ -57,12 +87,29 @@ const SignIn = ({ onLogin }) => {
               required
             />
           </div>
-          <button type="submit" /* ... styles ... */>
+          {error && (
+            <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>
+          )}
+          <button
+            type="submit"
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              backgroundColor: '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '1rem',
+              fontWeight: '500',
+              transition: 'background-color 0.3s',
+            }}
+          >
             Sign In
           </button>
         </form>
-        <p>
-          New user? <Link to="/signup" /* ... styles ... */>Create Account</Link>
+        <p style={{ marginTop: '1.5rem', color: '#666', fontSize: '0.875rem' }}>
+          New user? <Link to="/signup" style={{ color: '#007bff', textDecoration: 'none' }}>Create Account</Link>
         </p>
       </div>
     </div>

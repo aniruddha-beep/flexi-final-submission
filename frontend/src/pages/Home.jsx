@@ -1,4 +1,5 @@
 import { useTheme } from '../context/ThemeContext';
+import  LogoutButton  from '../components/LogoutButton';
 
 function Home() {
   const { isDarkTheme, toggleTheme } = useTheme();
